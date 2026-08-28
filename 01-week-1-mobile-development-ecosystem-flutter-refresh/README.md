@@ -14,7 +14,7 @@ Data yang digunakan:
 
 Contoh tampilan informasi:
 
-![Tampilan profil mahasiswa](screenshots/hasilLatihanMandiri.png)
+![Tampilan profil mahasiswa](screenshots/hasilLatihanMandiri1.png)
 
 
 Screenshot hasil latihan Mandiri
