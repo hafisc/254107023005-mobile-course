@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/todo.dart';
+import '../providers/todo_provider.dart';
+
+class TodoTile extends ConsumerWidget {
+  final Todo todo;
+
+  const TodoTile({super.key, required this.todo});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      leading: Checkbox(
+        value: todo.done,
+        onChanged: (_) {
+          // Mengubah status todo secara immutable dengan ref.read() di callback
+          ref.read(todoListProvider.notifier).toggle(todo.id);
+        },
+      ),
+      title: Text(
+        todo.title,
+        style: TextStyle(
+          decoration: todo.done ? TextDecoration.lineThrough : null,
+          color: todo.done ? Colors.grey : null,
+        ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete, color: Colors.redAccent),
+        onPressed: () {
+          // Menghapus todo dengan ref.read() di callback
+          ref.read(todoListProvider.notifier).remove(todo.id);
+        },
+      ),
+    );
+  }
+}
