@@ -27,9 +27,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen<AsyncValue<bool>>(authStateProvider, (previous, next) {
       next.whenOrNull(
         error: (error, stackTrace) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.toString())),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error.toString())));
         },
       );
     });
@@ -58,10 +58,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             else
               ElevatedButton(
                 onPressed: () {
-                  ref.read(authStateProvider.notifier).login(
-                        _emailController.text,
-                        _passwordController.text,
-                      );
+                  ref
+                      .read(authStateProvider.notifier)
+                      .login(_emailController.text, _passwordController.text);
                 },
                 child: const Text('Login'),
               ),

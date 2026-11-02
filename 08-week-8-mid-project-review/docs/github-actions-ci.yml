@@ -1,0 +1,80 @@
+# GitHub Actions CI Workflow
+
+File ini adalah dokumentasi tentang CI/CD yang diimplementasikan untuk Week 8.
+
+## File CI
+
+**Path**: `.github/workflows/ci.yml` (di root repository)
+
+## Isi Workflow
+
+```yaml
+name: CI - Flutter Analyze & Test
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  verify:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        project:
+          - 07-week-7-clean-architecture
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.project }}
+        run: flutter pub get
+
+      - name: Verify formatting
+        working-directory: ${{ matrix.project }}
+        run: dart format --set-exit-if-changed .
+
+      - name: Run static analysis
+        working-directory: ${{ matrix.project }}
+        run: flutter analyze --fatal-infos
+
+      - name: Run tests
+        working-directory: ${{ matrix.project }}
+        run: flutter test --reporter=expanded
+```
+
+## Cara Kerja
+
+1. **Trigger**: CI berjalan pada setiap Pull Request ke `main` atau `develop`, dan setiap push ke `develop`.
+2. **Matrix**: Saat ini memeriksa project `07-week-7-clean-architecture`.
+3. **Steps**:
+   - `flutter pub get`: Install semua dependencies.
+   - `dart format --set-exit-if-changed .`: Gagal jika ada file yang tidak terformat (exit code 1).
+   - `flutter analyze --fatal-infos`: Gagal bahkan pada level `info` (ketat).
+   - `flutter test`: Gagal jika ada test yang merah.
+
+## Manfaat
+
+- PR yang kotor ditolak mesin **sebelum** dibaca reviewer → menghemat waktu review.
+- Konsistensi: semua kontributor diperiksa dengan standar yang sama.
+- Dokumentasi otomatis: badge CI bisa ditempel di README.
+
+## Branch Protection (Rekomendasi)
+
+Aktifkan di GitHub Settings → Branches → Branch Protection Rules untuk `main` dan `develop`:
+- ✅ Require status checks to pass before merging
+- ✅ Require branches to be up to date before merging
+- ✅ Require pull request reviews before merging (minimum 1)
+- ✅ Restrict pushes that create matching branches

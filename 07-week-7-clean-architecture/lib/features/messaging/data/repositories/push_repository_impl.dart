@@ -2,7 +2,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 
-
 final _local = FlutterLocalNotificationsPlugin();
 String? pendingDeepLink;
 
@@ -50,11 +49,13 @@ class PushService {
     );
   }
 
-  Future<void> initFcmToken({required Future<void> Function(String token) onToken}) async {
+  Future<void> initFcmToken({
+    required Future<void> Function(String token) onToken,
+  }) async {
     // 1. Ambil token
     final token = await FirebaseMessaging.instance.getToken();
     if (token != null) await onToken(token);
-    
+
     // 2. Listen untuk token refresh
     FirebaseMessaging.instance.onTokenRefresh.listen(onToken);
   }

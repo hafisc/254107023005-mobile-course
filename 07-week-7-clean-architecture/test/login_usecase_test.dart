@@ -29,8 +29,11 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<({String? token, Failure? failure})> refresh(String refreshToken) {
-    throw UnimplementedError();
+  Future<({String? token, Failure? failure})> refresh(String refreshToken) async {
+    return (
+      token: null,
+      failure: const NetworkFailure('refresh not implemented in fake'),
+    );
   }
 }
 
@@ -38,8 +41,11 @@ void main() {
   test('LoginUseCase sukses mengembalikan session', () async {
     final repo = FakeAuthRepository();
     final usecase = LoginUseCase(repo);
-    final result = await usecase.call(email: 'test@example.com', password: 'password123');
-    
+    final result = await usecase.call(
+      email: 'test@example.com',
+      password: 'password123',
+    );
+
     expect(result.failure, isNull);
     expect(result.session, isNotNull);
     expect(result.session!.access, 'fake-access-token');
@@ -48,8 +54,11 @@ void main() {
   test('LoginUseCase gagal mengembalikan failure tanpa exception', () async {
     final repo = FakeAuthRepository(fail: true);
     final usecase = LoginUseCase(repo);
-    final result = await usecase.call(email: 'test@example.com', password: 'wrong');
-    
+    final result = await usecase.call(
+      email: 'test@example.com',
+      password: 'wrong',
+    );
+
     expect(result.session, isNull);
     expect(result.failure, isA<NetworkFailure>());
     expect(result.failure!.message, 'Invalid credentials (simulasi)');

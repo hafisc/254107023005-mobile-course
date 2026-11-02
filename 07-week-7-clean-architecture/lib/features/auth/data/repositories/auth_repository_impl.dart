@@ -10,7 +10,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
     if (!email.contains('@') || password.length < 6) {
-      return (session: null, failure: const NetworkFailure('Email atau kata sandi tidak valid'));
+      return (
+        session: null,
+        failure: const NetworkFailure('Email atau kata sandi tidak valid'),
+      );
     }
     return (
       session: AuthSession(
@@ -22,10 +25,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<({String? token, Failure? failure})> refresh(String refreshToken) async {
+  Future<({String? token, Failure? failure})> refresh(
+    String refreshToken,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     if (refreshToken.isEmpty) {
-      return (token: null, failure: const NetworkFailure('Refresh token hilang'));
+      return (
+        token: null,
+        failure: const NetworkFailure('Refresh token hilang'),
+      );
     }
     return (
       token: 'mock-access-renewed-${DateTime.now().millisecondsSinceEpoch}',
