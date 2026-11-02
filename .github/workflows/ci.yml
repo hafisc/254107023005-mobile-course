@@ -1,0 +1,45 @@
+name: CI - Flutter Analyze & Test
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  verify:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        project:
+          - 07-week-7-clean-architecture
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.project }}
+        run: flutter pub get
+
+      - name: Verify formatting
+        working-directory: ${{ matrix.project }}
+        run: dart format --set-exit-if-changed .
+
+      - name: Run static analysis
+        working-directory: ${{ matrix.project }}
+        run: flutter analyze --fatal-infos
+
+      - name: Run tests
+        working-directory: ${{ matrix.project }}
+        run: flutter test --reporter=expanded
+

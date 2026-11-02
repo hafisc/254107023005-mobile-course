@@ -11,7 +11,7 @@ import 'features/messaging/data/repositories/push_repository_impl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase (tambahkan options sesuai platform jika ada google-services.json)
   await Firebase.initializeApp();
 
@@ -20,21 +20,21 @@ void main() async {
   final pushService = PushService();
   await pushService.initLocalNotifications();
   await pushService.requestNotificationPermission();
-  
+
   // Langganan topik (contoh)
   await pushService.subscribeToTopic('pengumuman-kampus');
 
   // Mengirim FCM token ke backend (simulasi log)
-  await pushService.initFcmToken(onToken: (token) async {
-    debugPrint('FCM Token: ${token.substring(0, 12)}...');
-    // Di sini akan dikirim ke API backend via dio.post('/devices', ...)
-  });
+  await pushService.initFcmToken(
+    onToken: (token) async {
+      debugPrint('FCM Token: ${token.substring(0, 12)}...');
+      // Di sini akan dikirim ke API backend via dio.post('/devices', ...)
+    },
+  );
 
   runApp(
     ProviderScope(
-      overrides: [
-        pushServiceProvider.overrideWithValue(pushService),
-      ],
+      overrides: [pushServiceProvider.overrideWithValue(pushService)],
       child: const MainApp(),
     ),
   );
@@ -67,37 +67,27 @@ class _MainAppState extends ConsumerState<MainApp> {
         return null;
       },
       routes: [
-        GoRoute(
-          path: AppRoutes.login,
-          builder: (_, __) => const LoginPage(),
-        ),
-        GoRoute(
-          path: AppRoutes.home,
-          builder: (_, __) => const HomePage(),
-        ),
+        GoRoute(path: AppRoutes.login, builder: (_, __) => const LoginPage()),
+        GoRoute(path: AppRoutes.home, builder: (_, __) => const HomePage()),
         GoRoute(
           path: '${AppRoutes.announcementPrefix}/:id',
-          builder: (_, state) => AnnouncementPage(
-            id: state.pathParameters['id'] ?? '',
-          ),
+          builder: (_, state) =>
+              AnnouncementPage(id: state.pathParameters['id'] ?? ''),
         ),
       ],
     );
 
     // Listen untuk auth changes
-    ref.listenManual(
-      authStateProvider,
-      (previous, next) {
-        _router.refresh();
-      },
-    );
+    ref.listenManual(authStateProvider, (previous, next) {
+      _router.refresh();
+    });
 
     // Push service foreground & terminated handling
     final push = ref.read(pushServiceProvider);
     push.listenForeground((route) {
       if (mounted) _router.push(route);
     });
-    
+
     // Memberi sedikit delay agar router siap, kemudian handle initial message
     WidgetsBinding.instance.addPostFrameCallback((_) {
       push.handleTerminated((route) {

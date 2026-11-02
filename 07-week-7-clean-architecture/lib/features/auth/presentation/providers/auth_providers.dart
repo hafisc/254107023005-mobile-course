@@ -16,8 +16,9 @@ final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
   return LoginUseCase(ref.watch(authRepositoryProvider));
 });
 
-final authStateProvider =
-    AsyncNotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
+final authStateProvider = AsyncNotifierProvider<AuthNotifier, bool>(
+  AuthNotifier.new,
+);
 
 class AuthNotifier extends AsyncNotifier<bool> {
   @override
@@ -32,14 +33,17 @@ class AuthNotifier extends AsyncNotifier<bool> {
       final result = await ref
           .read(loginUseCaseProvider)
           .call(email: email, password: password);
-          
+
       if (result.failure != null) {
         throw Exception(result.failure!.message);
       }
-      
+
       await ref
           .read(tokenStoreProvider)
-          .save(access: result.session!.access, refresh: result.session!.refresh);
+          .save(
+            access: result.session!.access,
+            refresh: result.session!.refresh,
+          );
       return true;
     });
   }
