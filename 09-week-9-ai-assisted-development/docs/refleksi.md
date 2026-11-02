@@ -53,3 +53,4 @@
   3. **Kompleksitas Asinkron**: Jika dialihkan ke SQLite, setiap ketukan huruf pada search box membutuhkan mekanisme `Debounce` dan pembatalan query asinkron agar tidak terjadi *race condition* atau UI lag.
   4. **Konsistensi Arsitektur**: In-memory filter menjaga state tetap reaktif dan selaras dengan pola *Offline-First* Riverpod yang sudah dibangun dari Minggu 5.
 - **Kesimpulan**: Developer harus memahami konteks dan trade-off aplikasinya sendiri. Tidak semua saran "optimasi" dari AI relevan atau dibutuhkan.
+
