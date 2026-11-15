@@ -104,6 +104,28 @@ flutter test --reporter=expanded
 
 ---
 
+## 📱 Uji Manual (Emulator Pixel 7)
+
+Catatan uji dibuat lewat tombol **+** (judul otomatis `Catatan Baru`, isi berisi waktu pembuatan).
+
+| No | Skenario | Query | Hasil |
+|---|---|---|---|
+| 1 | Belum ada catatan | - | Empty state "Belum ada catatan" |
+| 2 | Query kosong | *(kosong)* | Semua catatan tampil |
+| 3 | Query cocok | `ca` | 3 catatan "Catatan Baru" tampil |
+| 4 | Query tak cocok | `belanja` | Empty state pencarian + tombol "Hapus Pencarian" |
+| 5 | Detail catatan | - | Isi catatan (field `body`) yang ikut dicari |
+
+| 1. Empty awal | 2. Query kosong | 3. Query cocok |
+|---|---|---|
+| ![Empty awal](screenshots/01_empty_awal.png) | ![Query kosong](screenshots/02_query_kosong.png) | ![Query cocok](screenshots/03_query_cocok.png) |
+
+| 4. Query tak cocok | 5. Detail catatan |
+|---|---|
+| ![Query tak cocok](screenshots/04_query_tidak_cocok.png) | ![Detail catatan](screenshots/05_cari_isi.png) |
+
+---
+
 ## 🤖 AI Challenge: Evaluasi Kritis Terhadap Saran AI
 
 | Temuan Saran AI | Kategori | Keputusan | Alasan Teknis |
