@@ -29,7 +29,9 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<({String? token, Failure? failure})> refresh(String refreshToken) async {
+  Future<({String? token, Failure? failure})> refresh(
+    String refreshToken,
+  ) async {
     return (
       token: null,
       failure: const NetworkFailure('refresh not implemented in fake'),
