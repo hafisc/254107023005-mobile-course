@@ -19,6 +19,7 @@ jobs:
           - 09-week-9-ai-assisted-development
           - 10-week-10-ai-feature-integration
           - 11-week-11-performance-optimization
+          - 12-week-12-testing-quality-assurance
 
     steps:
       - name: Checkout repository
