@@ -1,0 +1,29 @@
+{
+  "sebelum": {
+    "belanja 1": {
+      "AppBar": 9,
+      "Badge": 9,
+      "EmptyStateWidget": 1,
+      "NoteTile": 88,
+      "NotesPage": 9,
+      "TextField": 9
+    },
+    "belanja": {
+      "AppBar": 7,
+      "Badge": 7,
+      "NoteTile": 77,
+      "NotesPage": 7,
+      "TextField": 7
+    }
+  },
+  "sesudah": {
+    "belanja 1": {
+      "EmptyStateWidget": 1,
+      "TextField": 1
+    },
+    "belanja": {
+      "NoteTile": 11,
+      "TextField": 1
+    }
+  }
+}
