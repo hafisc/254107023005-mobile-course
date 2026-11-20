@@ -1,0 +1,107 @@
+# Week 13: pipeline CI/CD untuk 13-week-13-ci-cd-automation.
+# Alur: checkout -> Flutter -> format -> analyze -> test -> build APK/AAB -> artefak.
+# Setiap step berhenti di kegagalan pertama, jadi build tidak dibuat bila test gagal.
+name: Flutter CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    # Filter path tidak berlaku untuk push tag; tag v* selalu menjalankan pipeline.
+    paths:
+      - '13-week-13-ci-cd-automation/**'
+      - '.github/workflows/flutter-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '13-week-13-ci-cd-automation/**'
+      - '.github/workflows/flutter-ci.yml'
+  workflow_dispatch:
+
+# Job hanya membaca kode; tidak ada izin tulis.
+permissions:
+  contents: read
+
+# Push baru ke branch/PR yang sama membatalkan run lama.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_DIR: 13-week-13-ci-cd-automation
+
+jobs:
+  test-and-build:
+    name: Test & build Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ${{ env.APP_DIR }}
+
+    steps:
+      # Action di-pin ke commit SHA (komentar = tag) agar tag yang dipindah
+      # tidak bisa menyusupkan kode lain ke pipeline.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      # Versi Flutter dikunci sama dengan lokal (3.32.1 / Dart 3.8.1),
+      # bukan "stable terbaru", agar hasil CI bisa direproduksi.
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: stable
+          flutter-version: '3.32.1'
+          cache: true
+
+      - name: Versi tool
+        run: |
+          flutter --version
+          java -version
+          echo "Commit: $GITHUB_SHA"
+          grep '^version:' pubspec.yaml
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Static analysis
+        run: flutter analyze --fatal-infos
+
+      - name: Unit & widget tests
+        run: flutter test --coverage --reporter=expanded
+
+      - name: Build APK (release)
+        run: flutter build apk --release
+
+      - name: Build AAB (release)
+        run: flutter build appbundle --release
+
+      - name: Checksum artefak
+        run: |
+          cd build/app/outputs
+          sha256sum flutter-apk/app-release.apk bundle/release/app-release.aab | tee checksums.txt
+
+      # Nama artefak memuat SHA commit agar file bisa ditelusuri ke source-nya.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: android-builds-${{ github.sha }}
+          path: |
+            ${{ env.APP_DIR }}/build/app/outputs/flutter-apk/app-release.apk
+            ${{ env.APP_DIR }}/build/app/outputs/bundle/release/app-release.aab
+            ${{ env.APP_DIR }}/build/app/outputs/checksums.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-${{ github.sha }}
+          path: ${{ env.APP_DIR }}/coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 7
